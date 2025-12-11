@@ -8,6 +8,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=105801111', 'ym');
+    
+        ym(105801111, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/105801111" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
     
     <script>
         tailwind.config = {
@@ -103,7 +117,9 @@
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                 <!-- Direct Download Button -->
-                <a href="https://github.com/BarredEwe/Snowfall/releases/download/1.0.0/SnowfallApp.zip" class="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-xl font-bold flex items-center justify-center gap-3 hover:scale-105 transition-transform duration-200 shadow-lg shadow-blue-500/30">
+                <a href="https://github.com/BarredEwe/Snowfall/releases/download/1.0.0/SnowfallApp.zip" 
+                   onclick="ym(105801111, 'reachGoal', 'download_zip'); return true;"
+                   class="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-xl font-bold flex items-center justify-center gap-3 hover:scale-105 transition-transform duration-200 shadow-lg shadow-blue-500/30">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span data-lang="ru">Скачать напрямую</span>
                     <span data-lang="en">Direct Download</span>
@@ -111,7 +127,9 @@
                 </a>
 
                 <!-- App Store Button -->
-                <a href="https://apps.apple.com/app/snowfall-desktop/id6738747268" target="_blank" class="group relative px-8 py-4 bg-white text-black rounded-xl font-bold flex items-center justify-center gap-3 hover:scale-105 transition-transform duration-200">
+                <a href="https://apps.apple.com/app/snowfall-desktop/id6738747268" target="_blank" 
+                   onclick="ym(105801111, 'reachGoal', 'click_appstore'); return true;"
+                   class="group relative px-8 py-4 bg-white text-black rounded-xl font-bold flex items-center justify-center gap-3 hover:scale-105 transition-transform duration-200">
                     <svg class="w-6 h-6" viewBox="0 0 384 512" fill="currentColor"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 46.9 126.7 98 126.7 32.3 0 52-21.9 86.3-21.9 32 0 48.3 21.9 80.7 21.9 53.3 0 84.7-89.6 98-126.7 2.8-7.9 7.9-22.9 14.4-38.3-29.4-11-47-28.7-47-66.2zM216.5 60.5c15.7-22.1 27.2-51.5 23-83.3-26.6 4.3-58.4 19.3-77 41.7-16.1 19.3-28.2 49-23.7 82.3 27.6 2.3 58.7-16.7 77.7-40.7z"/></svg>
                     <span>App Store</span>
                     <div class="absolute inset-0 rounded-xl ring-2 ring-white/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
