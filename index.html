@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snowfall Desktop — Atmospheric Snow for macOS</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            accent: '#38bdf8',
+                            glow: '#0ea5e9'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 1s ease-out',
+                        'float': 'float 6s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-20px)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #050505; color: #ffffff; overflow-x: hidden; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        #snow-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        /* Language Switching Logic */
+        [data-lang="en"] { display: none; }
+        body.lang-en [data-lang="ru"] { display: none; }
+        body.lang-en [data-lang="en"] { display: block; }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-accent selection:text-white relative">
+
+    <!-- Interactive Background -->
+    <canvas id="snow-canvas"></canvas>
+
+    <!-- Header / Nav -->
+    <nav class="fixed w-full z-50 top-0 left-0 border-b border-white/5 bg-black/50 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <!-- Replace src with your icon path -->
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 shadow-[0_0_15px_rgba(56,189,248,0.5)] flex items-center justify-center text-xs font-bold">❄️</div>
+                <span class="font-semibold tracking-tight">Snowfall Desktop</span>
+            </div>
+            
+            <div class="flex items-center gap-6 text-sm font-medium text-gray-400">
+                <a href="https://github.com/BarredEwe/Snowfall" target="_blank" class="hover:text-white transition-colors">GitHub</a>
+                <a href="#features" class="hover:text-white transition-colors" data-lang="en">Features</a>
+                <a href="#features" class="hover:text-white transition-colors" data-lang="ru">Возможности</a>
+                
+                <!-- Language Switcher -->
+                <button onclick="toggleLanguage()" class="text-white bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition-all border border-white/5">
+                    <span id="lang-label">RU</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex flex-col justify-center items-center text-center px-4 pt-20 relative">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-accent/10 rounded-full blur-[120px] -z-10 animate-pulse"></div>
+
+        <div class="animate-fade-in max-w-3xl mx-auto space-y-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300 text-xs font-medium uppercase tracking-wider mb-4">
+                <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                v1.0 Available Now
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40 pb-2">
+                <span data-lang="ru">Зимняя магия<br>на вашем Mac</span>
+                <span data-lang="en">Winter Magic<br>on your Mac</span>
+            </h1>
+
+            <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                <span data-lang="ru">Реалистичный снегопад для рабочего стола. Уютная атмосфера, умная физика и ноль влияния на производительность.</span>
+                <span data-lang="en">Realistic desktop snowfall. Cozy atmosphere, smart physics, and zero performance impact.</span>
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                <!-- App Store Button -->
+                <a href="#" class="group relative px-8 py-4 bg-white text-black rounded-xl font-bold flex items-center justify-center gap-3 hover:scale-105 transition-transform duration-200">
+                    <svg class="w-6 h-6" viewBox="0 0 384 512" fill="currentColor"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 46.9 126.7 98 126.7 32.3 0 52-21.9 86.3-21.9 32 0 48.3 21.9 80.7 21.9 53.3 0 84.7-89.6 98-126.7 2.8-7.9 7.9-22.9 14.4-38.3-29.4-11-47-28.7-47-66.2zM216.5 60.5c15.7-22.1 27.2-51.5 23-83.3-26.6 4.3-58.4 19.3-77 41.7-16.1 19.3-28.2 49-23.7 82.3 27.6 2.3 58.7-16.7 77.7-40.7z"/></svg>
+                    <span>Download for macOS</span>
+                    <div class="absolute inset-0 rounded-xl ring-2 ring-white/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </a>
+
+                <!-- GitHub Button -->
+                <a href="https://github.com/BarredEwe/Snowfall" target="_blank" class="px-8 py-4 glass-panel rounded-xl font-semibold flex items-center justify-center gap-3 hover:bg-white/10 transition-colors">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.05-.015-2.055-3.33.72-4.035-1.605-4.035-1.605-.54-1.38-1.335-1.755-1.335-1.755-1.095-.75.075-.735.075-.735 1.215.09 1.845 1.245 1.845 1.245 1.065 1.83 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405 1.02 0 2.04.135 3 .405 2.295-1.545 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.285 0 .315.225.69.825.57C20.565 21.795 24 17.31 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                    <span>View on GitHub</span>
+                </a>
+            </div>
+            
+            <div class="pt-8 text-sm text-gray-500">
+                <a href="#" class="hover:text-blue-400 transition-colors flex items-center justify-center gap-2">
+                    <span data-lang="ru">Также доступно в Telegram</span>
+                    <span data-lang="en">Also available in Telegram</span>
+                    →
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visuals / Screenshots -->
+    <section class="py-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-blue-900/20 group">
+                <!-- Placeholder for screenshot. Replace src with your file -->
+                <img src="assets/Snimok-ekrana-2025-12-11-v-19.22.15.jpg" alt="Snowfall Interface" class="w-full h-auto object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500">
+                
+                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-8 md:p-12">
+                    <h3 class="text-2xl font-bold mb-2">
+                        <span data-lang="ru">Интуитивное управление</span>
+                        <span data-lang="en">Intuitive Controls</span>
+                    </h3>
+                    <p class="text-gray-400">
+                        <span data-lang="ru">Меняйте скорость, размер и ветер одним кликом.</span>
+                        <span data-lang="en">Adjust speed, size, and wind with a single click.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section id="features" class="py-20 px-6 bg-white/5">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="glass-panel p-8 rounded-2xl hover:bg-white/5 transition-colors">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-6 text-2xl">⚡️</div>
+                <h3 class="text-xl font-bold mb-3">
+                    <span data-lang="ru">Native & Fast</span>
+                    <span data-lang="en">Native & Fast</span>
+                </h3>
+                <p class="text-gray-400 leading-relaxed">
+                    <span data-lang="ru">Написано на Swift и Metal. Работает на GPU, не нагружая процессор. Батарея скажет спасибо.</span>
+                    <span data-lang="en">Built with Swift and Metal. Runs on GPU, keeping CPU idle. Battery friendly.</span>
+                </p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="glass-panel p-8 rounded-2xl hover:bg-white/5 transition-colors">
+                <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-6 text-2xl">🧊</div>
+                <h3 class="text-xl font-bold mb-3">
+                    <span data-lang="ru">Умная физика</span>
+                    <span data-lang="en">Smart Physics</span>
+                </h3>
+                <p class="text-gray-400 leading-relaxed">
+                    <span data-lang="ru">Снежинки реагируют на окна, тают при касании и разлетаются от курсора мыши.</span>
+                    <span data-lang="en">Snowflakes react to windows, melt on contact, and scatter from your mouse cursor.</span>
+                </p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="glass-panel p-8 rounded-2xl hover:bg-white/5 transition-colors">
+                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-6 text-2xl">🔒</div>
+                <h3 class="text-xl font-bold mb-3">
+                    <span data-lang="ru">Приватность</span>
+                    <span data-lang="en">Privacy First</span>
+                </h3>
+                <p class="text-gray-400 leading-relaxed">
+                    <span data-lang="ru">Никакой слежки и аналитики. Все настройки хранятся только локально на вашем Mac.</span>
+                    <span data-lang="en">No tracking, no analytics. All settings live locally on your Mac. Zero data collection.</span>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- For Developers / Under Hood -->
+    <section class="py-20 px-6 text-center">
+        <h2 class="text-3xl font-bold mb-12">
+            <span data-lang="ru">Для разработчиков</span>
+            <span data-lang="en">Under the Hood</span>
+        </h2>
+        <div class="max-w-4xl mx-auto glass-panel rounded-2xl p-1 font-mono text-sm text-left overflow-hidden">
+            <div class="bg-black/50 p-4 border-b border-white/5 flex gap-2">
+                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                <span class="ml-4 text-gray-500">SnowRenderer.swift</span>
+            </div>
+            <div class="p-6 md:p-8 text-gray-300 overflow-x-auto">
+                <pre><code><span class="text-purple-400">import</span> MetalKit
+
+<span class="text-blue-400">class</span> SnowRenderer: NSObject, MTKViewDelegate {
+    <span class="text-gray-500">// 6000+ particles rendered with zero lag</span>
+    <span class="text-purple-400">func</span> <span class="text-yellow-300">draw</span>(in view: MTKView) {
+        <span class="text-purple-400">guard let</span> commandBuffer = commandQueue.makeCommandBuffer() <span class="text-purple-400">else</span> { <span class="text-purple-400">return</span> }
+        
+        <span class="text-gray-500">// Update physics compute shader</span>
+        computeEncoder.<span class="text-yellow-300">setComputePipelineState</span>(pipelineState)
+        computeEncoder.<span class="text-yellow-300">dispatchThreadgroups</span>(groups, threadsPerGroup: threads)
+        
+        <span class="text-gray-500">// 100% Open Source on GitHub</span>
+    }
+}</code></pre>
+            </div>
+        </div>
+        <div class="mt-8">
+            <a href="https://github.com/BarredEwe/Snowfall" class="text-blue-400 hover:text-blue-300 border-b border-blue-400/30 pb-0.5 transition-colors">
+                <span data-lang="ru">Изучить исходный код →</span>
+                <span data-lang="en">Explore Source Code →</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 py-12 text-center text-sm text-gray-600 bg-black">
+        <div class="flex justify-center gap-6 mb-8">
+            <a href="#" class="hover:text-white transition-colors">Telegram</a>
+            <a href="#" class="hover:text-white transition-colors">App Store</a>
+            <a href="#" class="hover:text-white transition-colors">GitHub</a>
+            <a href="mailto:contact@example.com" class="hover:text-white transition-colors">Email</a>
+        </div>
+        <p class="mb-2">© 2025 Snowfall Desktop. Made with ❄️ in Russia.</p>
+        <p class="text-xs text-gray-700">
+            <span data-lang="ru">Данные не собираются и не передаются. Приложение работает полностью офлайн.</span>
+            <span data-lang="en">No data collected. App runs completely offline.</span>
+        </p>
+    </footer>
+
+    <!-- Interactive Scripts -->
+    <script>
+        // --- Language Switcher ---
+        let currentLang = 'ru';
+        const body = document.body;
+        const langLabel = document.getElementById('lang-label');
+        
+        function toggleLanguage() {
+            currentLang = currentLang === 'ru' ? 'en' : 'ru';
+            body.className = body.className.replace(/lang-(en|ru)/, '') + ` lang-${currentLang}`;
+            langLabel.innerText = currentLang.toUpperCase();
+        }
+        
+        // --- Snow Effect (Performance Optimized) ---
+        const canvas = document.getElementById('snow-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        const particles = [];
+        const particleCount = 100; // Keep web lightweight
+        
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        
+        class Snowflake {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * height; // Start spread out
+            }
+            
+            reset() {
+                this.x = Math.random() * width;
+                this.y = -10;
+                this.size = Math.random() * 3 + 1;
+                this.speed = Math.random() * 1 + 0.5;
+                this.opacity = Math.random() * 0.5 + 0.3;
+                this.sway = Math.random() * 0.1;
+                this.swayOffset = Math.random() * Math.PI * 2;
+            }
+            
+            update() {
+                this.y += this.speed;
+                this.x += Math.sin(this.y * 0.01 + this.swayOffset) * 0.5;
+                
+                if (this.y > height) {
+                    this.reset();
+                }
+            }
+            
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function initSnow() {
+            resize();
+            for(let i=0; i<particleCount; i++) {
+                particles.push(new Snowflake());
+            }
+            animate();
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        
+        window.addEventListener('resize', resize);
+        initSnow();
+    </script>
+</body>
+</html>
